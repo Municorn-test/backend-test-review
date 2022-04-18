@@ -24,8 +24,6 @@ namespace MunicornTest.DataAccess.Repositories
             _logger = logger;
         }
 
-        public long TicketCount { get; private set; }
-
         public long StorageSize
         {
             get
@@ -39,6 +37,7 @@ namespace MunicornTest.DataAccess.Repositories
 
         public async Task<bool> AddTicketAsync(Ticket ticket)
         {
+            _logger.LogInformation($"Adding ticket: {ticket.Title}");
             try
             {
                 await AddAsync(ticket);
@@ -62,7 +61,6 @@ namespace MunicornTest.DataAccess.Repositories
                 storageFile.Close();
             }
 
-            TicketCount++;
             _logger.LogInformation("Ticket added");
 
             return true;

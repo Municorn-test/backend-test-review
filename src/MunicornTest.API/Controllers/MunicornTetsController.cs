@@ -14,6 +14,7 @@ namespace MunicornTest.API.Controllers
     [ApiController]
     public class MunicornTetsController : ControllerBase
     {
+        private long _ticketCount;
         private FileRepository FileRepository { get; set; }
 
         public MunicornTetsController(ILogger logger)
@@ -24,11 +25,14 @@ namespace MunicornTest.API.Controllers
         [HttpPost("AddTicket")]
         public async Task<IActionResult> AddTicket(string t, Ticket.State s, string a, List<string> co)
         {
-            //insert empty ticket if title is null
-            if (t == null)
-                return Ok(await FileRepository.AddTicketAsync(null));
+            var isTicketAdded = await FileRepository.AddTicketAsync(
+                ValidateAndCreateTicket(t, s, a, co)
+                );
+            
+            if(isTicketAdded) 
+                _ticketCount++;
 
-            return Ok(await FileRepository.AddTicketAsync(new Ticket() { Title = t, CurrentState = s, AssignedToUser = a, Comments = co }));
+            return Ok(isTicketAdded);
         }
 
         [HttpGet("StorageSize")]
@@ -40,7 +44,18 @@ namespace MunicornTest.API.Controllers
         [HttpGet("TicketCount")]
         public async Task<ActionResult> GetTicketCount()
         {
-            return Ok(FileRepository.TicketCount);
+            return Ok(_ticketCount);
+        }
+
+        private static Ticket ValidateAndCreateTicket(string title, Ticket.State state, string assignedToUser, List<string> comments)
+        {
+            if (title == null)
+            {
+                Console.WriteLine("Title is required");
+                return null;
+            }
+
+            return new Ticket() { Title = title, CurrentState = state, AssignedToUser = assignedToUser, Comments = comments };
         }
     }
 }
