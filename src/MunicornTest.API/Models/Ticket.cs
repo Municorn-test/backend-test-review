@@ -10,12 +10,11 @@ namespace MunicornTest.BusinnessLogic.Models
         public string Title { get; set; }
         public State CurrentState { get; set; }
         public string AssignedToUser { get; set; }
-        public int Count { get; set; }
         public List<string> Comments { get; set; }
 
         public override string ToString()
         {
-            return $"{Id} {Title} {CurrentState} {AssignedToUser} {Count} {String.Join(", ", Comments.ToArray())}";
+            return $"{Id} {Title} {CurrentState} {AssignedToUser} {String.Join(", ", Comments.ToArray())}";
         }
 
         public enum State

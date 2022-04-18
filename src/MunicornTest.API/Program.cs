@@ -24,12 +24,12 @@ namespace MunicornTest.Api
 
         private static IConfiguration GetConfiguration()
         {
-            var enviromentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var name = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{enviromentName}.json", optional: true)
+                .AddJsonFile($"appsettings.{name}.json", optional: true)
                 .AddEnvironmentVariables();
 
             return builder.Build();

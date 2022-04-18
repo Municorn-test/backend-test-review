@@ -22,13 +22,25 @@ namespace MunicornTest.API.Controllers
         }
 
         [HttpPost("AddTicket")]
-        public async Task<IActionResult> AddTicket(string t, Ticket.State s, string a, int c, List<string> co)
+        public async Task<IActionResult> AddTicket(string t, Ticket.State s, string a, List<string> co)
         {
             //insert empty ticket if title is null
             if (t == null)
                 return Ok(await FileRepository.AddTicketAsync(null));
 
-            return Ok(await FileRepository.AddTicketAsync(new Ticket() { Title = t, CurrentState = s, AssignedToUser = a, Count = c, Comments = co }));
+            return Ok(await FileRepository.AddTicketAsync(new Ticket() { Title = t, CurrentState = s, AssignedToUser = a, Comments = co }));
+        }
+
+        [HttpGet("StorageSize")]
+        public async Task<IActionResult> GetStorageSize()
+        {
+            return Ok(FileRepository.StorageSize);
+        }
+
+        [HttpGet("TicketCount")]
+        public async Task<ActionResult> GetTicketCount()
+        {
+            return Ok(FileRepository.TicketCount);
         }
     }
 }

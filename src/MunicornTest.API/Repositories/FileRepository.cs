@@ -4,19 +4,37 @@ using System.IO;
 using System.Linq;
 using MunicornTest.BusinnessLogic.Models;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 
 namespace MunicornTest.DataAccess.Repositories
 {
     public class FileRepository
     {
+        private const string StorageFileName = "tickets.txt";
+
         ILogger _logger;
-        public object _lock = new();
+        public object _storageLock = new();
+
 
         public FileRepository(ILogger logger)
         {
             _logger = logger;
+        }
+
+        public long TicketCount { get; private set; }
+
+        public long StorageSize
+        {
+            get
+            {
+                lock (_storageLock)
+                {
+                    return new FileInfo(StorageFileName).Length;
+                }
+            }
         }
 
         public async Task<bool> AddTicketAsync(Ticket ticket)
@@ -36,15 +54,16 @@ namespace MunicornTest.DataAccess.Repositories
 
         private async Task<bool> AddAsync(Ticket ticket)
         {
-            ticket.Count += 1;
-
-            lock (_lock)
+            lock (_storageLock)
             {
-                //todo IO
-                //StreamWriter writer = new StreamWriter("C:/prod/database.txt");
-
-                //writer.WriteLine(ticket.ToString());
+                var jsonString = JsonSerializer.Serialize(ticket);
+                var storageFile = new StreamWriter(StorageFileName, true);
+                storageFile.WriteLine(jsonString);
+                storageFile.Close();
             }
+
+            TicketCount++;
+            _logger.LogInformation("Ticket added");
 
             return true;
         }
